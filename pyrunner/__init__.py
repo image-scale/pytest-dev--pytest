@@ -7,5 +7,6 @@ from pyrunner.outcomes import skip, fail, xfail, skip_if, importorskip, Skipped,
 from pyrunner.fixtures import fixture, FixtureManager, Scope
 from pyrunner.parametrize import parametrize
 from pyrunner.approx import approx
+from pyrunner.raises import raises
 
 __version__ = "0.1.0"
