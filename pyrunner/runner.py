@@ -2,9 +2,11 @@
 
 import sys
 import time
+import traceback
 from pathlib import Path
 
 from pyrunner.discovery import discover_test_files, discover_tests
+from pyrunner.assertion import introspect_assertion
 
 
 class Outcome:
@@ -61,8 +63,9 @@ class Session:
             result = RunResult(filepath, name, Outcome.PASSED, duration=elapsed)
         except AssertionError as exc:
             elapsed = time.perf_counter() - start
+            enhanced = self._enhance_assertion(exc)
             result = RunResult(filepath, name, Outcome.FAILED,
-                                duration=elapsed, exception=exc)
+                                duration=elapsed, exception=enhanced or exc)
         except Exception as exc:
             elapsed = time.perf_counter() - start
             result = RunResult(filepath, name, Outcome.ERROR,
@@ -70,6 +73,20 @@ class Session:
 
         self.results.append(result)
         return result
+
+    def _enhance_assertion(self, exc):
+        """Try to produce an enhanced assertion error with value details."""
+        tb = exc.__traceback__
+        if tb is None:
+            return None
+        while tb.tb_next:
+            tb = tb.tb_next
+        msg = introspect_assertion(tb)
+        if msg:
+            enhanced = AssertionError(msg)
+            enhanced.__traceback__ = exc.__traceback__
+            return enhanced
+        return None
 
     def run_all(self):
         """Run all collected tests."""
