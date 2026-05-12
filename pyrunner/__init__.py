@@ -6,5 +6,6 @@ from pyrunner.assertion import format_comparison, format_unary, introspect_asser
 from pyrunner.outcomes import skip, fail, xfail, skip_if, importorskip, Skipped, Failed, ExpectedFailure
 from pyrunner.fixtures import fixture, FixtureManager, Scope
 from pyrunner.parametrize import parametrize
+from pyrunner.approx import approx
 
 __version__ = "0.1.0"
