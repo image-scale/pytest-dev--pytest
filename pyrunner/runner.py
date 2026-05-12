@@ -10,6 +10,8 @@ from pyrunner.discovery import discover_test_files, discover_tests
 from pyrunner.assertion import introspect_assertion
 from pyrunner.outcomes import Skipped, Failed, ExpectedFailure
 from pyrunner.fixtures import FixtureManager, Scope
+from pyrunner.capture import capsys
+from pyrunner.tmpdir import tmp_path, tmp_path_factory
 
 
 class Outcome:
@@ -44,6 +46,12 @@ class Session:
         self.verbosity = verbosity
         self.results = []
         self.fixture_manager = FixtureManager()
+        self._register_builtin_fixtures()
+
+    def _register_builtin_fixtures(self):
+        for fn in [capsys, tmp_path, tmp_path_factory]:
+            if hasattr(fn, '_fixture_definition'):
+                self.fixture_manager.register(fn._fixture_definition)
 
     def collect(self):
         """Discover all test files and test items."""

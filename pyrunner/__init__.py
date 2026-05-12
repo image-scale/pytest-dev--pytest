@@ -10,5 +10,7 @@ from pyrunner.approx import approx
 from pyrunner.raises import raises
 from pyrunner.warn_utils import warns, deprecated_call
 from pyrunner.patching import Patcher
+from pyrunner.capture import CaptureFixture, CaptureResult, capsys
+from pyrunner.tmpdir import TempPathFactory, tmp_path, tmp_path_factory
 
 __version__ = "0.1.0"
