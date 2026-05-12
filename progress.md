@@ -20,3 +20,10 @@
 **Commit**: Add test outcome control functions
 **Acceptance**: 9/9 criteria met
 **Verification**: tests FAIL on previous state, PASS on current state
+
+## Round 4
+**Task**: Task 4 — Fixture system with dependency injection
+**Files created**: pyrunner/fixtures.py, tests/test_fixtures.py
+**Commit**: Add a fixture system that provides dependency injection
+**Acceptance**: 9/9 criteria met
+**Verification**: tests FAIL on previous state, PASS on current state

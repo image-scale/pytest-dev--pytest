@@ -42,8 +42,11 @@ def _load_module_from_path(filepath):
 def discover_tests(paths):
     """Discover all test functions from a list of file paths.
 
-    Returns a list of (module, func_name, func) tuples.
+    Expands parametrized tests into individual test cases.
+    Returns a list of (filepath, test_name, callable) tuples.
     """
+    from pyrunner.parametrize import expand_parametrized, make_test_id
+
     collected = []
     for filepath in paths:
         try:
@@ -56,5 +59,8 @@ def discover_tests(paths):
             if name.startswith("test_"):
                 obj = getattr(module, name)
                 if callable(obj):
-                    collected.append((str(filepath), name, obj))
+                    expanded = expand_parametrized(obj)
+                    for param_id, bound_func in expanded:
+                        test_name = make_test_id(name, param_id)
+                        collected.append((str(filepath), test_name, bound_func))
     return collected

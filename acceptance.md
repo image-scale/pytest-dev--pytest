@@ -55,3 +55,15 @@
 - [ ] Session-scope fixtures are shared across the entire test session
 - [ ] Autouse fixtures are automatically applied to all tests without being requested
 - [ ] The fixture system integrates with the test runner
+
+## Task 5: Test parametrization
+
+### Acceptance Criteria
+- [ ] A parametrize decorator takes parameter names and a list of values and creates multiple test cases
+- [ ] Each parameter set runs the test function once with those argument values
+- [ ] Multiple parameters can be specified as comma-separated string "a,b" or as a list ["a", "b"]
+- [ ] Test IDs include the parameter values for identification (e.g., test_add[1-2])
+- [ ] Parametrize works with single values (not tuples) for single parameters
+- [ ] Parametrize works with tuples for multiple parameters
+- [ ] Multiple parametrize decorators create a cartesian product of test cases
+- [ ] Parametrized tests integrate with the test runner and report individual results
