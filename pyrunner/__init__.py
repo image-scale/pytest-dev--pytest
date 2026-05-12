@@ -9,5 +9,6 @@ from pyrunner.parametrize import parametrize
 from pyrunner.approx import approx
 from pyrunner.raises import raises
 from pyrunner.warn_utils import warns, deprecated_call
+from pyrunner.patching import Patcher
 
 __version__ = "0.1.0"
