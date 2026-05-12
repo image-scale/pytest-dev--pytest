@@ -1,5 +1,6 @@
 """Test execution and reporting."""
 
+import inspect
 import sys
 import time
 import traceback
@@ -8,6 +9,7 @@ from pathlib import Path
 from pyrunner.discovery import discover_test_files, discover_tests
 from pyrunner.assertion import introspect_assertion
 from pyrunner.outcomes import Skipped, Failed, ExpectedFailure
+from pyrunner.fixtures import FixtureManager, Scope
 
 
 class Outcome:
@@ -41,6 +43,7 @@ class Session:
         self.paths = paths or ["."]
         self.verbosity = verbosity
         self.results = []
+        self.fixture_manager = FixtureManager()
 
     def collect(self):
         """Discover all test files and test items."""
@@ -48,7 +51,23 @@ class Session:
         for p in self.paths:
             all_files.extend(discover_test_files(p))
         self.test_items = discover_tests(all_files)
+        self._collect_fixtures()
         return self.test_items
+
+    def _collect_fixtures(self):
+        """Scan discovered modules for fixture definitions."""
+        seen_modules = set()
+        for filepath, name, func_or_exc in self.test_items:
+            if not callable(func_or_exc):
+                continue
+            mod = inspect.getmodule(func_or_exc)
+            if mod is None or id(mod) in seen_modules:
+                continue
+            seen_modules.add(id(mod))
+            for attr_name in dir(mod):
+                obj = getattr(mod, attr_name)
+                if callable(obj) and hasattr(obj, '_fixture_definition'):
+                    self.fixture_manager.register(obj._fixture_definition)
 
     def run_single_test(self, filepath, name, func_or_exc):
         """Run one test function and record its result."""
@@ -65,7 +84,8 @@ class Session:
 
         start = time.perf_counter()
         try:
-            func_or_exc()
+            kwargs = self.fixture_manager.resolve_test_args(func_or_exc)
+            func_or_exc(**kwargs)
             elapsed = time.perf_counter() - start
             if xfail_expected:
                 result = RunResult(filepath, name, Outcome.XPASS, duration=elapsed)
@@ -101,6 +121,7 @@ class Session:
                 result = RunResult(filepath, name, Outcome.ERROR,
                                     duration=elapsed, exception=exc)
 
+        self.fixture_manager.teardown_function()
         self.results.append(result)
         return result
 
@@ -121,9 +142,17 @@ class Session:
     def run_all(self):
         """Run all collected tests."""
         self.collect()
+        current_file = None
         for filepath, name, func_or_exc in self.test_items:
+            if filepath != current_file:
+                if current_file is not None:
+                    self.fixture_manager.teardown_module()
+                current_file = filepath
             result = self.run_single_test(filepath, name, func_or_exc)
             self._report_result(result)
+        if current_file is not None:
+            self.fixture_manager.teardown_module()
+        self.fixture_manager.teardown_session()
 
     def _report_result(self, result):
         """Print a single test result line."""

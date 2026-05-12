@@ -33,12 +33,25 @@
 ## Task 3: Test outcome control with skip, skipif, xfail, and fail
 
 ### Acceptance Criteria
-- [ ] skip(reason) raises an exception that causes the test to be reported as skipped (not failed)
-- [ ] fail(reason) raises an exception that causes the test to fail with the given reason
-- [ ] xfail(reason) marks the test as expected to fail; if it does fail it's reported as xfail (expected), not as failure
-- [ ] skip_if(condition, reason) conditionally skips a test based on a boolean condition
-- [ ] Skipped tests are counted separately in the summary (not as passed or failed)
-- [ ] xfail tests that pass unexpectedly are reported as xpass
-- [ ] The runner integrates these outcomes into its summary report
-- [ ] importorskip(modname) imports a module or skips the test if it can't be imported
-- [ ] importorskip with minversion skips if the module version is too low
+- [x] skip(reason) raises an exception that causes the test to be reported as skipped (not failed)
+- [x] fail(reason) raises an exception that causes the test to fail with the given reason
+- [x] xfail(reason) marks the test as expected to fail; if it does fail it's reported as xfail (expected), not as failure
+- [x] skip_if(condition, reason) conditionally skips a test based on a boolean condition
+- [x] Skipped tests are counted separately in the summary (not as passed or failed)
+- [x] xfail tests that pass unexpectedly are reported as xpass
+- [x] The runner integrates these outcomes into its summary report
+- [x] importorskip(modname) imports a module or skips the test if it can't be imported
+- [x] importorskip with minversion skips if the module version is too low
+
+## Task 4: Fixture system with dependency injection
+
+### Acceptance Criteria
+- [ ] A @fixture decorator marks a function as a fixture provider
+- [ ] Test functions with parameters matching fixture names receive the fixture value automatically
+- [ ] Generator-based fixtures (using yield) support setup and teardown: code before yield runs before the test, code after runs after
+- [ ] Fixtures can depend on other fixtures (fixture functions can request fixtures as parameters)
+- [ ] Function-scope fixtures are created fresh for each test function
+- [ ] Module-scope fixtures are shared across all tests in a module
+- [ ] Session-scope fixtures are shared across the entire test session
+- [ ] Autouse fixtures are automatically applied to all tests without being requested
+- [ ] The fixture system integrates with the test runner

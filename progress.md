@@ -13,3 +13,10 @@
 **Commit**: Add enhanced assertion failure messages that show expression values
 **Acceptance**: 10/10 criteria met
 **Verification**: tests FAIL on previous state, PASS on current state
+
+## Round 3
+**Task**: Task 3 — Test outcome control with skip, fail, xfail, skip_if, importorskip
+**Files created**: pyrunner/outcomes.py, tests/test_outcomes.py
+**Commit**: Add test outcome control functions
+**Acceptance**: 9/9 criteria met
+**Verification**: tests FAIL on previous state, PASS on current state
