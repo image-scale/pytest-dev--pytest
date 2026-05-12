@@ -7,12 +7,16 @@ from pathlib import Path
 
 from pyrunner.discovery import discover_test_files, discover_tests
 from pyrunner.assertion import introspect_assertion
+from pyrunner.outcomes import Skipped, Failed, ExpectedFailure
 
 
 class Outcome:
     PASSED = "PASSED"
     FAILED = "FAILED"
     ERROR = "ERROR"
+    SKIPPED = "SKIPPED"
+    XFAIL = "XFAIL"
+    XPASS = "XPASS"
 
 
 class RunResult:
@@ -56,20 +60,46 @@ class Session:
             self.results.append(result)
             return result
 
+        xfail_expected = getattr(func_or_exc, '_xfail', False)
+        xfail_reason = getattr(func_or_exc, '_xfail_reason', '')
+
         start = time.perf_counter()
         try:
             func_or_exc()
             elapsed = time.perf_counter() - start
-            result = RunResult(filepath, name, Outcome.PASSED, duration=elapsed)
+            if xfail_expected:
+                result = RunResult(filepath, name, Outcome.XPASS, duration=elapsed)
+            else:
+                result = RunResult(filepath, name, Outcome.PASSED, duration=elapsed)
+        except Skipped as exc:
+            elapsed = time.perf_counter() - start
+            result = RunResult(filepath, name, Outcome.SKIPPED,
+                                duration=elapsed, exception=exc)
+        except ExpectedFailure as exc:
+            elapsed = time.perf_counter() - start
+            result = RunResult(filepath, name, Outcome.XFAIL,
+                                duration=elapsed, exception=exc)
+        except Failed as exc:
+            elapsed = time.perf_counter() - start
+            result = RunResult(filepath, name, Outcome.FAILED,
+                                duration=elapsed, exception=exc)
         except AssertionError as exc:
             elapsed = time.perf_counter() - start
-            enhanced = self._enhance_assertion(exc)
-            result = RunResult(filepath, name, Outcome.FAILED,
-                                duration=elapsed, exception=enhanced or exc)
+            if xfail_expected:
+                result = RunResult(filepath, name, Outcome.XFAIL,
+                                    duration=elapsed, exception=exc)
+            else:
+                enhanced = self._enhance_assertion(exc)
+                result = RunResult(filepath, name, Outcome.FAILED,
+                                    duration=elapsed, exception=enhanced or exc)
         except Exception as exc:
             elapsed = time.perf_counter() - start
-            result = RunResult(filepath, name, Outcome.ERROR,
-                                duration=elapsed, exception=exc)
+            if xfail_expected:
+                result = RunResult(filepath, name, Outcome.XFAIL,
+                                    duration=elapsed, exception=exc)
+            else:
+                result = RunResult(filepath, name, Outcome.ERROR,
+                                    duration=elapsed, exception=exc)
 
         self.results.append(result)
         return result
@@ -97,15 +127,10 @@ class Session:
 
     def _report_result(self, result):
         """Print a single test result line."""
-        if result.outcome == Outcome.PASSED:
-            status = "PASSED"
-        elif result.outcome == Outcome.FAILED:
-            status = "FAILED"
-        else:
-            status = "ERROR"
+        status = result.outcome
         print(f"{result.node_id} {status}")
 
-        if result.exception and result.outcome != Outcome.PASSED:
+        if result.exception and result.outcome in (Outcome.FAILED, Outcome.ERROR):
             exc = result.exception
             print(f"    {type(exc).__name__}: {exc}")
 
@@ -114,6 +139,9 @@ class Session:
         passed = sum(1 for r in self.results if r.outcome == Outcome.PASSED)
         failed = sum(1 for r in self.results if r.outcome == Outcome.FAILED)
         errors = sum(1 for r in self.results if r.outcome == Outcome.ERROR)
+        skipped = sum(1 for r in self.results if r.outcome == Outcome.SKIPPED)
+        xfailed = sum(1 for r in self.results if r.outcome == Outcome.XFAIL)
+        xpassed = sum(1 for r in self.results if r.outcome == Outcome.XPASS)
         total_time = sum(r.duration for r in self.results)
 
         parts = []
@@ -123,6 +151,12 @@ class Session:
             parts.append(f"{failed} failed")
         if errors:
             parts.append(f"{errors} error")
+        if skipped:
+            parts.append(f"{skipped} skipped")
+        if xfailed:
+            parts.append(f"{xfailed} xfailed")
+        if xpassed:
+            parts.append(f"{xpassed} xpassed")
         if not parts:
             parts.append("no tests ran")
 

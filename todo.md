@@ -5,8 +5,8 @@ Build a Python testing framework from the ground up. Start with the core test ru
 
 ## Tasks
 - [x] Task 1: Core test runner with discovery, execution, reporting, and CLI entry point (discover test_*.py files and test_ functions, run them, report pass/fail/error counts, exit with appropriate code)
-- [>] Task 2: Enhanced assertion failure messages that show expression values when an assert statement fails
-- [ ] Task 3: Test outcome control with skip, skipif, xfail, and fail functions plus marker-based equivalents
+- [x] Task 2: Enhanced assertion failure messages that show expression values when an assert statement fails
+- [>] Task 3: Test outcome control with skip, skipif, xfail, and fail functions plus marker-based equivalents
 - [ ] Task 4: Fixture system with dependency injection, scopes (function/module/session), setup/teardown via generators, and autouse
 - [ ] Task 5: Test parametrization to run a single test function with multiple sets of arguments
 - [ ] Task 6: Approximate floating-point comparison utility for tolerant numeric equality checks

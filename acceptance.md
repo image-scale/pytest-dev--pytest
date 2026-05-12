@@ -19,13 +19,26 @@
 ## Task 2: Enhanced assertion failure messages
 
 ### Acceptance Criteria
-- [ ] When `assert a == b` fails, the failure message shows the actual values of a and b
-- [ ] When `assert a != b` fails, the message shows the equal values
-- [ ] When `assert a > b` fails, the message shows the actual values
-- [ ] When `assert a in b` fails, the message shows the item and the container
-- [ ] When `assert a is b` fails, the message shows the object representations
-- [ ] Supports `assert not expr` showing what the expression evaluated to
-- [ ] Works with `assert func_call() == expected` showing the function return value
-- [ ] Provides a function that takes two values and an operator, and formats a detailed comparison message
-- [ ] Handles string comparisons by showing a diff-like representation for long strings
-- [ ] The assertion introspection integrates with the test runner to show enhanced messages on failure
+- [x] When `assert a == b` fails, the failure message shows the actual values of a and b
+- [x] When `assert a != b` fails, the message shows the equal values
+- [x] When `assert a > b` fails, the message shows the actual values
+- [x] When `assert a in b` fails, the message shows the item and the container
+- [x] When `assert a is b` fails, the message shows the object representations
+- [x] Supports `assert not expr` showing what the expression evaluated to
+- [x] Works with `assert func_call() == expected` showing the function return value
+- [x] Provides a function that takes two values and an operator, and formats a detailed comparison message
+- [x] Handles string comparisons by showing a diff-like representation for long strings
+- [x] The assertion introspection integrates with the test runner to show enhanced messages on failure
+
+## Task 3: Test outcome control with skip, skipif, xfail, and fail
+
+### Acceptance Criteria
+- [ ] skip(reason) raises an exception that causes the test to be reported as skipped (not failed)
+- [ ] fail(reason) raises an exception that causes the test to fail with the given reason
+- [ ] xfail(reason) marks the test as expected to fail; if it does fail it's reported as xfail (expected), not as failure
+- [ ] skip_if(condition, reason) conditionally skips a test based on a boolean condition
+- [ ] Skipped tests are counted separately in the summary (not as passed or failed)
+- [ ] xfail tests that pass unexpectedly are reported as xpass
+- [ ] The runner integrates these outcomes into its summary report
+- [ ] importorskip(modname) imports a module or skips the test if it can't be imported
+- [ ] importorskip with minversion skips if the module version is too low
